@@ -9,14 +9,10 @@ console.log(User);
  
 
 const userSignup = async(ctx)=>{
-    console.log(ctx.request.body);
+   //  console.log(ctx.request.body);
    const {email,password} = ctx.request.body
    ctx.request.body.password = await bcryptPassword(password)
-   // const count = await User.countDocuments({email})
-   // if(count>0){
-   //    ctx.body = {msg:"email is already exist"}
-   //    return
-   // }
+   
    ctx.request.body.createdAt = new Date()
    await User.insertOne(ctx.request.body)
    ctx.body = {msg:"Signup successfully!"}
@@ -24,7 +20,7 @@ const userSignup = async(ctx)=>{
 
 const userLogin = async(ctx)=>{
    const token = ctx.headers.authorization.split(" ")[1]
-   console.log(token);
+   // console.log(token);
    const {email,password} = ctx.request.body 
    const user = await User.findOne({email})
    if(user && await bcrypt.compare(password,user.password)){
@@ -39,7 +35,7 @@ const userLogin = async(ctx)=>{
 
 const deleteUser = async(ctx)=>{
    const {id} = ctx.request.params
-   console.log(id);
+   // console.log(id);
    await User.deleteOne({_id:new ObjectId(id)})
    ctx.body = {msg : "User Deleted!"}
 }

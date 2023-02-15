@@ -1,66 +1,61 @@
 import { ObjectId } from "mongodb";
 import { client } from "../database/db";
-import nodemailer from "nodemailer"
+import nodemailer from "nodemailer";
+import JWT from "jsonwebtoken";
+import env from "dotenv";
+import { genToken } from "../validation/uservalidation";
+import { verifyJWT } from "../utils/jwt";
+env.config();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const Invite = client.db("facebook").collection("invitation");
 
-
 const invite = async (ctx) => {
-    const { email, role, pageId } = ctx.request.body;
-    const data = {
-      reciver: email,
-      sender: ctx.userData.email,
-      role,
-      userId: ctx.userData._id,
-      pageId: new ObjectId(pageId),
-  
-    };
-    await Invite.insertOne(data);
-    ctx.body = {msg : "Invitation send successfully!"};
+  const { reciever, role, pageId } = ctx.request.body;
+  const data = {
+    reciever: reciever,
+    sender: ctx.userData.email,
+    role,
+    status: 2,    //Bydefault - pending
+    userId: ctx.userData._id,
+    pageId: new ObjectId(pageId),
+  };
+  const invitation = await Invite.insertOne(data);
+  console.log(invitation);
+  const token = genToken({ invitationId: invitation.insertedId }, "2d");
+  const url = `localhost:3000/invite/acceptreject?token=` + token;
+  ctx.body = { msg: "Invitation send successfully!", url };
+};
+
+
+const updateInvitation = async (ctx) => {
+  const { id } = ctx.request.params;
+  await Invite.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: { like: "chess" } }
+  );
+  ctx.body = { msg: "Invitation Updated!" };
+};
+
+const deleteInvitation = async (ctx) => {
+  const { id } = ctx.request.params;
+  await Invite.deleteOne({ _id: new ObjectId(id) });
+  ctx.body = { msg: "Invitation Deleted!" };
+};
+
+const acceptReject = async (ctx) => {
+  const { token } = ctx.request.query;
+  const data = verifyJWT(token);
+  console.log(data);
+  const _id = new ObjectId(data?.invitationId);
+  const invitation = await Invite.findOne({ _id });
+  // console.log(invitation);
+  if (invitation) {
+    await Invite.updateOne({ _id }, { $set: { status:ctx.request.body.status} });
+
   }
+  ctx.body = {msg : "show status"}
 
-  const updateInvitation = async(ctx)=>{
-    const {id} = ctx.request.params
-    await Invite.updateOne({_id:new ObjectId(id)},{$set : {like:"chess"}})
-    ctx.body = {msg : "Invitation Updated!"}
-  }
+};
 
-  const deleteInvitation = async(ctx)=>{
-     const {id} = ctx.request.params
-     await Invite.deleteOne({_id:new ObjectId(id)})
-     ctx.body = {msg : "Invitation Deleted!"}
-  }
-
-  const sendMail = async(ctx)=>{
-     const testAccount = await nodemailer.createTestAccount()
-
-     //connect with the smtp
-     let transporter =  nodemailer.createTransport({
-       host: "smtp.ethereal.email",
-       port: "587",
-       auth: {
-         user: "theo58@ethereal.email",
-         pass: "WgEynbGgXp49uqCfCd"
-       }
-     })
-     //send mail with transpoter object
-     let info = await transporter.sendMail({
-      from : "vidhi5410rana@gmail.com",
-      to: "vanshpratik0165@gmail.com",
-      subject : "Hello",
-      text : "hello world",
-      html : "<h1>dcscd</h1>"
-     })
-
-     console.log("msg sent : %s",info.messageId);
-
-       ctx.body = {msg : "mail"}
-  }
-
-
-  export {invite,
-    updateInvitation,
-    deleteInvitation,
-    sendMail
-  }
-   
+export { invite, updateInvitation, deleteInvitation, acceptReject };

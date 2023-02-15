@@ -13,4 +13,17 @@ const isInvited = async(ctx,next)=>{
    await next() 
 }
 
-export {isInvited}
+const alreadyInvited = async(ctx,next)=>{
+   const {reciever} = ctx.request.body
+   const cnt = await Invite.countDocuments({reciever})
+   if(cnt > 0 ){
+      ctx.body = {msg : "User is already invited"}
+      return
+   }
+   await next()
+}
+
+
+export {isInvited,
+   alreadyInvited
+ }
