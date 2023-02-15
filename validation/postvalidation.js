@@ -12,4 +12,24 @@ const isPostExist = async(ctx,next)=>{
    await next()
 }
 
-export {isPostExist}
+const requiredFields = async(ctx,next) =>{
+   const data = ctx.request.body
+   let msg = []
+   // console.log(data)
+   
+   let arr_field = Object.keys(data)
+   let required_fileds = ["media","pageId","content"]
+
+
+   for(const i of arr_field){
+      
+   }
+
+   if(msg.length!==0){
+      ctx.body = {msg}
+   }
+   else{   await next()
+   }
+   
+}  
+export {isPostExist,requiredFields}

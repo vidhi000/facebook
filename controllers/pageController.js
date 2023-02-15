@@ -5,7 +5,7 @@ const Page = client.db("facebook").collection("pages");
 
 const createPage = async (ctx) => {
   ctx.request.body.createdAt = new Date();
-  console.log(ctx.userData);
+  // console.log(ctx.userData);
    ctx.request.body.userId = ctx.userData._id;
   await Page.insertOne(ctx.request.body);
   ctx.body = { msg: "Page is Created!" };

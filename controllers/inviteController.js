@@ -46,7 +46,7 @@ const deleteInvitation = async (ctx) => {
 const acceptReject = async (ctx) => {
   const { token } = ctx.request.query;
   const data = verifyJWT(token);
-  console.log(data);
+  // console.log(data);
   const _id = new ObjectId(data?.invitationId);
   const invitation = await Invite.findOne({ _id });
   // console.log(invitation);

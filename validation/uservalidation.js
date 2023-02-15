@@ -85,17 +85,17 @@ const requiredFields = async (ctx, next) => {
 //!---------trim, if empty then errormsg, if not value then delete field
   for (const i of arr_field) {
      if(typeof data[i] == "string") data[i].trim()
-     console.log(data[i]);
+    //  console.log(data[i]);
      if (required_field.includes(i) && data[i]=="") msg.push(`please enter your ${i}`)
      if (data[i]=="")delete(ctx.request.body[i]) 
   }
 
-  // if (msg.length!= 0) {
-  //   ctx.body = {msg};
-  //   return
-  // } else {
-  //   await next();
-  // }
+  if (msg.length!= 0) {
+    ctx.body = {msg};
+    return
+  } else {
+    await next();
+  }
 
 };
 
