@@ -49,13 +49,21 @@ const acceptReject = async (ctx) => {
   // console.log(data);
   const _id = new ObjectId(data?.invitationId);
   const invitation = await Invite.findOne({ _id });
-  // console.log(invitation);
-  if (invitation) {
+  console.log(invitation);
+  if (invitation.status == 2 ) {
     await Invite.updateOne({ _id }, { $set: { status:ctx.request.body.status} });
+    ctx.body = {msg : "update status"}
 
   }
-  ctx.body = {msg : "show status"}
+  else if(invitation.status == 1){
+    ctx.body = {msg : "Alreday accepted!"}
+  }
+  else {
+    ctx.body = {msg : "Alreday declied!"}
+  }
 
 };
+
+
 
 export { invite, updateInvitation, deleteInvitation, acceptReject };

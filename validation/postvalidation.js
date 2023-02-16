@@ -20,13 +20,22 @@ const requiredFields = async(ctx,next) =>{
    let arr_field = Object.keys(data)
    let required_fileds = ["media","pageId","content"]
 
-
-   for(const i of arr_field){
-      
-   }
+   for (const i of required_fileds) {
+      if (!arr_field.includes(i)) {
+        msg.push(`${i} is required!`);
+      }
+    }
+    for (const i of arr_field) {
+      if (typeof data[i] === "string") data[i] = data[i].trim();
+      if (required_fileds.includes(i) && data[i] == "")
+        msg.push(`please enter your ${i}`);
+      if (data[i] == "") delete ctx.request.body[i];
+    }
+  
 
    if(msg.length!==0){
       ctx.body = {msg}
+      return
    }
    else{   await next()
    }
