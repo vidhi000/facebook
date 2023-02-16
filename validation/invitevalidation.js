@@ -52,6 +52,15 @@ const requiredFields = async (ctx, next) => {
   }
 }
 
+const isValidReceiver = async (ctx, next) => {
+  const { reciever } = ctx.request.body;
+  const regex =
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  regex.test(reciever)
+    ? await next()
+    : (ctx.body = { msg: "please enter valid EmailId of reciever!" });
+};
+
 const isValidStatus = async(ctx,next) =>{
   const {status} = ctx.request.body
   console.log(status);
@@ -65,17 +74,20 @@ const isValidStatus = async(ctx,next) =>{
    }
    else{
     ctx.body = {msg : "Invalid status"}
-   }
-  //  for (const i in num) {
-  //    if(status.includes(i)){
-  //     await next()
-  //    }
-  //    else{
-  //     ctx.body = "Invalid status code!"
-  //    }
-  //  }
-   
+   }   
    }
 
+
+const isValidRole = async(ctx,next)=>{
+  const {role} = ctx.request.body
+  // console.log(role);
+  if(role==1 || role==2 || role==3){
+     await next()
+  } 
+  else{
+    ctx.body = {msg : "Invalid Role!"}
+  }
+}   
+
  
-export { isInvited, alreadyInvited, requiredFields,isValidStatus }
+export { isInvited, alreadyInvited, requiredFields,isValidStatus,isValidReceiver,isValidRole }

@@ -9,7 +9,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const User = client.db("facebook").collection("users");
 
 const isValidEmail = async (ctx, next) => {
-  ctx.request.body.email = ctx.request.body.email.trim().replace(" ", "");
   const { email } = ctx.request.body;
   // console.log(email);
   const regex =
@@ -75,25 +74,28 @@ const requiredFields = async (ctx, next) => {
 
   let data=ctx.request.body
   let arr_field=Object.keys(ctx.request.body)
-  let msg=[]
-
+  let errmsg={}
   //for required fileds
   let required_field=["firstName","lastName","email","password","contact"]
   for (const i of required_field) {
-    if (!arr_field.includes(i)) msg.push(`${i} is required`)
+    errmsg[i]=[]
+    if (!arr_field.includes(i)) errmsg[i].push(`${i} is required`)
+    console.log(errmsg[i]);
+
+    if (errmsg[i].length==0)delete(errmsg[i]) 
   }
 //!---------trim, if empty then errormsg, if not value then delete field
   for (const i of arr_field) {
-    
+    errmsg[i]=[]
      if(typeof data[i] == "string") data[i] = data[i].trim()
-    
-     console.log(data[i]);
-     if (required_field.includes(i) && data[i]=="") msg.push(`please enter your ${i}`)
+     if (required_field.includes(i) && data[i]=="") errmsg[i].push(`please enter your ${i}`)
      if (data[i]=="")delete(ctx.request.body[i]) 
+     console.log(errmsg[i]);
+     if (errmsg[i].length==0)delete(errmsg[i]) 
   }
 
-  if (msg.length!= 0) {
-    ctx.body = {msg};
+  if (Object.keys(errmsg).length!= 0) {
+    ctx.body = {error:errmsg};
     return
   } else {
     await next();

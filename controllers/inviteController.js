@@ -11,6 +11,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const Invite = client.db("facebook").collection("invitation");
 
 const invite = async (ctx) => {
+  console.log(ctx.host);
+
   const { reciever, role, pageId } = ctx.request.body;
   const data = {
     reciever: reciever,
@@ -18,12 +20,13 @@ const invite = async (ctx) => {
     role,
     status: 2,    //Bydefault - pending
     userId: ctx.userData._id,
-    pageId: new ObjectId(pageId),
+    pageId: new ObjectId(pageId)
   };
   const invitation = await Invite.insertOne(data);
   console.log(invitation);
   const token = genToken({ invitationId: invitation.insertedId }, "2d");
-  const url = `localhost:3000/invite/acceptreject?token=` + token;
+  const URL = ctx.host + `/invite/acceptreject?token=`
+  const url = URL + token;
   ctx.body = { msg: "Invitation send successfully!", url };
 };
 
@@ -52,14 +55,14 @@ const acceptReject = async (ctx) => {
   console.log(invitation);
   if (invitation.status == 2 ) {
     await Invite.updateOne({ _id }, { $set: { status:ctx.request.body.status} });
-    ctx.body = {msg : "update status"}
+    ctx.body = {msg : "Status is updated!"}
 
   }
   else if(invitation.status == 1){
-    ctx.body = {msg : "Alreday accepted!"}
+    ctx.body = {msg : "Already accepted!"}
   }
   else {
-    ctx.body = {msg : "Alreday declied!"}
+    ctx.body = {msg : "Already declied!"}
   }
 
 };
