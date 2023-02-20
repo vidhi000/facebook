@@ -75,12 +75,32 @@ const requiredFields = async (ctx, next) => {
   let data=ctx.request.body
   let arr_field=Object.keys(ctx.request.body)
   let errmsg={}
-  //for required fileds
-  let required_field=["firstName","lastName","email","password","contact"]
+  let required_field ;
+   //for required fileds
+  // console.log(ctx.request.url);
+  // let user_required_field=["firstName","lastName","email","password","contact"]
+  let post_required_field = ["media","pageId","content"] 
+  let page_required_field = ["pageName", "pageCategory", "bio"]
+  let invitation_required_field = ["pageId","role","reciever"]
+
+   if(ctx.request.url == "/user/signup"){
+      required_field = ["firstName","lastName","email","password","contact"]
+   }
+   else if(ctx.request.url == "/post/create"){
+    required_field =  ["media","pageId","content"]
+   }
+   else if(ctx.request.url == "/page/create"){
+    required_field = ["pageName", "pageCategory", "bio"]
+   }
+   else if(ctx.request.url == "/invite"){
+    required_field = ["pageId","role","reciever"]
+   }
+
+
   for (const i of required_field) {
     errmsg[i]=[]
     if (!arr_field.includes(i)) errmsg[i].push(`${i} is required`)
-    console.log(errmsg[i]);
+    // console.log(errmsg[i]);
 
     if (errmsg[i].length==0)delete(errmsg[i]) 
   }
@@ -90,7 +110,7 @@ const requiredFields = async (ctx, next) => {
      if(typeof data[i] == "string") data[i] = data[i].trim()
      if (required_field.includes(i) && data[i]=="") errmsg[i].push(`please enter your ${i}`)
      if (data[i]=="")delete(ctx.request.body[i]) 
-     console.log(errmsg[i]);
+    //  console.log(errmsg[i]);
      if (errmsg[i].length==0)delete(errmsg[i]) 
   }
 
@@ -138,6 +158,15 @@ const isValidContact = async(ctx,next) =>{
    await next()
 }
 
+const trimData = async(ctx,next)=>{
+  let data = ctx.request.body
+   Object.keys(data).forEach((ele)=>{
+       if(typeof data[ele] == "string") data[ele] = data[ele].trim()
+   })
+  await next()
+}
+
+
 export {
   isValidEmail,
   isValidPassword,
@@ -148,5 +177,7 @@ export {
   requiredFields,
   validDOB,
   isValidContact,
-  isUniqueContact
+  isUniqueContact,
+  trimData
+  
 };

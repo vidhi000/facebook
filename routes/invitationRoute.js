@@ -1,8 +1,9 @@
 import Router from "koa-router"
 import { invite,updateInvitation,deleteInvitation,acceptReject } from "../controllers/inviteController"
 import {auth} from "../middleware/auth"
-import { alreadyInvited, isInvited, isValidReceiver, isValidRole, isValidStatus,requiredFields } from "../validation/invitevalidation"
+import { alreadyInvited, isInvited, isValidReceiver, isValidRole, isValidStatus } from "../validation/invitevalidation"
 import {isPageExist} from "../validation/pagevalidation"
+import { requiredFields, trimData } from "../validation/uservalidation"
 
 
 
@@ -11,7 +12,7 @@ const inviteRouter = new Router({
 })
 
 inviteRouter.post("/",auth,requiredFields,isPageExist,isValidReceiver,isValidRole,alreadyInvited,invite)
-inviteRouter.put("/update/:id",auth,isInvited,updateInvitation)
+inviteRouter.put("/update/:id",auth,isInvited,trimData,isValidReceiver,isValidRole,updateInvitation)
 inviteRouter.delete("/delete/:id",auth,isInvited,deleteInvitation)
 inviteRouter.post("/acceptreject",auth,isValidStatus,acceptReject)
 

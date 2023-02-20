@@ -26,33 +26,33 @@ const isPageExist = async (ctx, next) => {
   await next();
 };
 
-const requiredFields = async (ctx, next) => {
-  let data = ctx.request.body;
-  //  console.log(data);
-  let array_filed = Object.keys(data);
-  // console.log(array_filed);
-  let msg = [];
+// const requiredFields = async (ctx, next) => {
+//   let data = ctx.request.body;
+//   //  console.log(data);
+//   let array_filed = Object.keys(data);
+//   // console.log(array_filed);
+//   let msg = [];
 
-  //for required fileds
-  const required_fileds= ["pageName", "pageCategory", "bio"];
-  for (const i of required_fileds) {
-    if (!array_filed.includes(i)) {
-      msg.push(`${i} is required!`);
-    }
-  }
-  for (const i of array_filed) {
-    if (typeof data[i] === "string") data[i]=data[i].trim();
-    if (required_fileds.includes(i) && data[i] == "")
-      msg.push(`please enter your ${i}`);
-    if (data[i] == "") delete ctx.request.body[i];
-  }
+//   //for required fileds
+//   const required_fileds= ["pageName", "pageCategory", "bio"];
+//   for (const i of required_fileds) {
+//     if (!array_filed.includes(i)) {
+//       msg.push(`${i} is required!`);
+//     }
+//   }
+//   for (const i of array_filed) {
+//     if (typeof data[i] === "string") data[i]=data[i].trim();
+//     if (required_fileds.includes(i) && data[i] == "")
+//       msg.push(`please enter your ${i}`);
+//     if (data[i] == "") delete ctx.request.body[i];
+//   }
 
-  if (msg.length != 0) {
-    ctx.body = { msg };
-    return;
-  } else {
-    await next();
-  }
-};
+//   if (msg.length != 0) {
+//     ctx.body = { msg };
+//     return;
+//   } else {
+//     await next();
+//   }
+// };
 
-export { isUniquePage, isPageExist, requiredFields };
+export { isUniquePage, isPageExist };

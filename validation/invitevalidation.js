@@ -25,32 +25,32 @@ const alreadyInvited = async (ctx, next) => {
   await next();
 };
 
-const requiredFields = async (ctx, next) => {
-  const data = ctx.request.body;
-  let arr_fields = Object.keys(data)
-  let msg = [];
-  let required_fileds = ["pageId","role","reciever"]
+// const requiredFields = async (ctx, next) => {
+//   const data = ctx.request.body;
+//   let arr_fields = Object.keys(data)
+//   let msg = [];
+//   let required_fileds = ["pageId","role","reciever"]
    
-  for(const i of required_fileds){
-     if(!arr_fields.includes(i)) msg.push(`${i} is required`)
-  }
-
-  for(const i of arr_fields){
-   if(typeof data[i] == "string") data[i]=data[i].trim()
-    //  console.log(data[i]);
-     if (required_fileds.includes(i) && data[i]=="") msg.push(`please enter your ${i}`)
-     if (data[i] == "")delete(ctx.request.body[i]) 
-  }
+//   for(const i of required_fileds){
+//      if(!arr_fields.includes(i)) msg.push(`${i} is required`)
 //   }
 
+//   for(const i of arr_fields){
+//    if(typeof data[i] == "string") data[i]=data[i].trim()
+//     //  console.log(data[i]);
+//      if (required_fileds.includes(i) && data[i]=="") msg.push(`please enter your ${i}`)
+//      if (data[i] == "")delete(ctx.request.body[i]) 
+//   }
+// //   }
+
   
-  if (msg.length != 0) {
-    ctx.body = { msg };
-    return;
-  } else {
-    await next();
-  }
-}
+//   if (msg.length != 0) {
+//     ctx.body = { msg };
+//     return;
+//   } else {
+//     await next();
+//   }
+// }
 
 const isValidReceiver = async (ctx, next) => {
   const { reciever } = ctx.request.body;
@@ -90,4 +90,4 @@ const isValidRole = async(ctx,next)=>{
 }   
 
  
-export { isInvited, alreadyInvited, requiredFields,isValidStatus,isValidReceiver,isValidRole }
+export { isInvited, alreadyInvited,isValidStatus,isValidReceiver,isValidRole }

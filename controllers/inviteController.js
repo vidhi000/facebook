@@ -5,6 +5,7 @@ import JWT from "jsonwebtoken";
 import env from "dotenv";
 import { genToken } from "../validation/uservalidation";
 import { verifyJWT } from "../utils/jwt";
+import { findById, findByIdAndDeleteOne, findByIdAndUpdateOne, insertOneDataIntoCollection } from "../model/user";
 env.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -22,7 +23,7 @@ const invite = async (ctx) => {
     userId: ctx.userData._id,
     pageId: new ObjectId(pageId)
   };
-  const invitation = await Invite.insertOne(data);
+  const invitation = await insertOneDataIntoCollection("invitation",data)
   console.log(invitation);
   const token = genToken({ invitationId: invitation.insertedId }, "2d");
   const URL = ctx.host + `/invite/acceptreject?token=`
@@ -33,16 +34,13 @@ const invite = async (ctx) => {
 
 const updateInvitation = async (ctx) => {
   const { id } = ctx.request.params;
-  await Invite.updateOne(
-    { _id: new ObjectId(id) },
-    { $set: { like: "chess" } }
-  );
+  await findByIdAndUpdateOne("invitation",id,ctx.request.body)
   ctx.body = { msg: "Invitation Updated!" };
 };
 
 const deleteInvitation = async (ctx) => {
   const { id } = ctx.request.params;
-  await Invite.deleteOne({ _id: new ObjectId(id) });
+  await findByIdAndDeleteOne("invitation",id)
   ctx.body = { msg: "Invitation Deleted!" };
 };
 
@@ -51,7 +49,7 @@ const acceptReject = async (ctx) => {
   const data = verifyJWT(token);
   // console.log(data);
   const _id = new ObjectId(data?.invitationId);
-  const invitation = await Invite.findOne({ _id });
+  const invitation = await findById("invitation",_id)
   console.log(invitation);
   if (invitation.status == 2 ) {
     await Invite.updateOne({ _id }, { $set: { status:ctx.request.body.status} });

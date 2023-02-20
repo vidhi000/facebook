@@ -3,6 +3,7 @@ import { bcryptPassword } from "../validation/uservalidation";
 import { genToken } from "../validation/uservalidation";
 import bcrypt from "bcrypt"
 import { ObjectId } from "mongodb";
+import { findByIdAndDeleteOne, findByIdAndUpdateOne, insertOneDataIntoCollection } from "../model/user";
 
 const User = client.db("facebook").collection("users")
 console.log(User);
@@ -14,7 +15,8 @@ const userSignup = async(ctx)=>{
    ctx.request.body.password = await bcryptPassword(password)
    
    ctx.request.body.createdAt = new Date()
-   await User.insertOne(ctx.request.body)
+   await insertOneDataIntoCollection("users",ctx.request.body)
+   
    ctx.body = {msg:"Signup successfully!"}
 }
 
@@ -36,13 +38,13 @@ const userLogin = async(ctx)=>{
 const deleteUser = async(ctx)=>{
    const {id} = ctx.request.params
    // console.log(id);
-   await User.deleteOne({_id:new ObjectId(id)})
+   await findByIdAndDeleteOne("users",id)
    ctx.body = {msg : "User Deleted!"}
 }
 
 const updateUser = async(ctx)=>{
     const {id} = ctx.request.params
-    await User.updateOne({_id: new ObjectId(id)},{$set : {like:"vidhi"}}) 
+    await findByIdAndUpdateOne("users",id,ctx.request.body) 
     ctx.body = {msg : "User Updated!"}
 }
 
