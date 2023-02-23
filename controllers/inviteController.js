@@ -1,7 +1,5 @@
 import { ObjectId } from "mongodb";
 import { client } from "../database/db";
-import nodemailer from "nodemailer";
-import JWT from "jsonwebtoken";
 import env from "dotenv";
 import { genToken } from "../validation/uservalidation";
 import { verifyJWT } from "../utils/jwt";
@@ -55,7 +53,7 @@ const acceptReject = async (ctx) => {
     await Invite.updateOne({ _id }, { $set: { status:ctx.request.body.status} });
     ctx.body = {msg : "Status is updated!"}
 
-  }
+  } 
   else if(invitation.status == 1){
     ctx.body = {msg : "Already accepted!"}
   }

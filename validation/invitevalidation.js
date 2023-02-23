@@ -7,10 +7,10 @@ const isInvited = async (ctx, next) => {
   // console.log(id);
   const invite = await Invite.countDocuments({ _id: new ObjectId(id) });
   if (!invite) {
-    ctx.body = { msg: "User is not invited!" };
-    return;
+    return { "validation": "User is not invited!" };
+    
   }
-  await next();
+  return null
 };
 
 const alreadyInvited = async (ctx, next) => {
@@ -19,10 +19,10 @@ const alreadyInvited = async (ctx, next) => {
   const cnt = await Invite.countDocuments({ reciever,pageId : new ObjectId(pageId) });
   // console.log(cnt);
   if (cnt > 0) {
-    ctx.body = { msg: "User is already invited" };
-    return;
+    return { "validation": "User is already invited" };
+  
   }
-  await next();
+  return null
 };
 
 // const requiredFields = async (ctx, next) => {
@@ -56,37 +56,41 @@ const isValidReceiver = async (ctx, next) => {
   const { reciever } = ctx.request.body;
   const regex =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  regex.test(reciever)
-    ? await next()
-    : (ctx.body = { msg: "please enter valid EmailId of reciever!" });
+  // regex.test(reciever)
+  //   ? await next()
+  //   : (ctx.body = { msg: "please enter valid EmailId of reciever!" });
+
+  if(!regex.test(reciever) && reciever){
+    return {"reciever" : "please enter valid EmailId of reciever!"}
+  }
+  else{
+    return null
+  }
 };
 
 const isValidStatus = async(ctx,next) =>{
   const {status} = ctx.request.body
   console.log(status);
   if(!status){
-    ctx.body = {msg : "please enter status code"}
-    return
+    return {"satatus" : "please enter status code"}
+    
   }
    if(status == 1 || status == 3)
    {
-     await next()
+    return null
    }
    else{
-    ctx.body = {msg : "Invalid status"}
+    return {"status" : "Invalid status"}
    }   
    }
 
 
 const isValidRole = async(ctx,next)=>{
   const {role} = ctx.request.body
-  // console.log(role);
-  if(role==1 || role==2 || role==3){
-     await next()
-  } 
-  else{
-    ctx.body = {msg : "Invalid Role!"}
-  }
+ if (role)
+    if(role==1 || role==2 || role==3) return null
+    else return {"role" : "Invalid Role!"}
+  else return null
 }   
 
  

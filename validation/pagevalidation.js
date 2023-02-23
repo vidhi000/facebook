@@ -8,10 +8,10 @@ const isUniquePage = async (ctx, next) => {
   // console.log(pageName);
   const count = await Page.countDocuments({ pageName });
   if (count > 0) {
-    ctx.body = { msg: "Page is already Exist" };
-    return;
+    return { "validation": "Page is already Exist" };
+    
   }
-  await next();
+  return null
 };
 
 const isPageExist = async (ctx, next) => {
@@ -20,10 +20,10 @@ const isPageExist = async (ctx, next) => {
   const page = await Page.countDocuments({ _id: new ObjectId(id) });
   //    console.log(page);
   if (!page) {
-    ctx.body = { msg: "Page does not Exist" };
-    return;
+    return { "validation": "Page does not Exist" };
+    
   }
-  await next();
+  return null
 };
 
 // const requiredFields = async (ctx, next) => {

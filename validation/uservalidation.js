@@ -11,11 +11,12 @@ const User = client.db("facebook").collection("users");
 const isValidEmail = async (ctx, next) => {
   const { email } = ctx.request.body;
   // console.log(email);
-  const regex =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  regex.test(email)
-    ? await next()
-    : (ctx.body = { msg: "please enter valid email" });
+  const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  // regex.test(email)
+  //   ? await next()
+  //   : (ctx.body = { msg: "please enter valid email" });
+  if(!(regex.test(email)) && email) return { "email": "please enter valid email" }
+  else return null
 };
 
 const isValidPassword = async (ctx, next) => {
@@ -23,19 +24,22 @@ const isValidPassword = async (ctx, next) => {
   const { password } = ctx.request.body;
   const regex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  regex.test(password)
-    ? await next()
-    : (ctx.body = { msg: "plaese enter valid password" });
+  // regex.test(password)
+  //   ? await next()
+  //   : (ctx.body = { msg: "plaese enter valid password" });
+  if(!(regex.test(password))) return { "password": "please enter valid password" }
+  else return null
+
 };
 
 const isUniqueEmail = async (ctx, next) => {
   const { email } = ctx.request.body;
   const userEmail = await User.countDocuments({ email });
   if (userEmail > 0) {
-    ctx.body = { msg: "Email is already Exist" };
-    return;
+    return  { "email": "Email is already Exist" };
+
   }
-  await next();
+   return null
   
 };
 
@@ -44,10 +48,10 @@ const isUniqueContact = async (ctx, next) => {
   const { contact } = ctx.request.body;
   const usercontact = await User.countDocuments({ contact });
   if (usercontact > 0) {
-    ctx.body = { msg: "Contact is already exist" };
-    return;
+    return { "conatct": "Contact is already exist" };
+    ;
   }
-  await next();
+  return null
   
 };
 
@@ -64,10 +68,10 @@ const isUserExist = async (ctx, next) => {
   // console.log(id);
   const user = await User.countDocuments({ _id: new ObjectId(id) });
   if (!user) {
-    ctx.body = { msg: "User does not exist" };
-    return;
+    return { "validation": "User does not exist" };
+    
   }
-  await next();
+  return null
 };
 
 const requiredFields = async (ctx, next) => {
@@ -115,10 +119,10 @@ const requiredFields = async (ctx, next) => {
   }
 
   if (Object.keys(errmsg).length!= 0) {
-    ctx.body = {error:errmsg};
-    return
+    return {error:errmsg};
+  
   } else {
-    await next();
+    return null
   }
 
 };
@@ -130,8 +134,8 @@ const validDOB = async(ctx,next) =>{
     
       let dt=new Date(date)
       if(dt>currentDate){
-         ctx.body = {msg : "U can not enter future date"}
-         return
+         return {"DOB" : "U can not enter future date"}
+        
       }
       else{
       // console.log(dt);
@@ -139,32 +143,32 @@ const validDOB = async(ctx,next) =>{
        let age = new Date(ageDiff).getUTCFullYear()
        let res = Math.abs(age - 1970) 
        if(res<18){
-        ctx.body = {msg : "U are not aligible for signup"} 
-        return
+        return {"DOB" : "U are not aligible for signup"} 
+        
        }
      } 
     }
-    await next()
+    return null
 }
 
 const isValidContact = async(ctx,next) =>{
-   const number = ctx.request.body.contact
+   const {contact} = ctx.request.body
    
-   if(!(number.toString().length == 10 && Number(number))){
-      ctx.body = {msg : "Invalid contact number"}
-      return
-   }
- 
-   await next()
+  if(contact) if(!(contact.toString().length == 10 && Number(contact)))
+    return {"contact" : "Invalid contact number"}
+     else  return null
+  else 
+    return null
 }
+  
 
 const trimData = async(ctx,next)=>{
   let data = ctx.request.body
    Object.keys(data).forEach((ele)=>{
        if(typeof data[ele] == "string") data[ele] = data[ele].trim()
    })
-  await next()
-}
+   return null
+  }
 
 
 export {
